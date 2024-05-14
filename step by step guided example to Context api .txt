@@ -1,0 +1,88 @@
+The current hierarchy is the app is the parent component -> which renders component1 -> which renderes component2 -> 
+which renders component3 and finally -> component3 renders the message
+
+question--> 
+what if i need some data in component3 that is being passed in component1
+(but 1 is rendering 2 which is then rendering 3 )
+
+
+So you will think ok in c1 we do ->                                        <Component2 name={"Aditya"}/>
+and then in the c3 we will use props to render it finally ->               const Component3 = (props) => {
+                                                                                 return (
+                                                                                   <div>
+                                                                                               <h1>hi from c3 {props.name} </h1>
+                                                                                   </div>
+                                                                                 )
+                                                                                }
+
+
+But this will not work it will not show the name just hi from c3 message 
+
+And hence the problem arises that -> inorder to pass on the data to the nested components we need to pass the data down the component 
+tree via props 
+i.e-> c1 to c2 to c3 [this is the standard or the bruteforce approach]
+
+example -> * data passed in c1 with a desire to render in c3->                       <Component2 name={"Aditya"}/>
+
+           * data used unnecessary by c2 ->                                          <Component3 name={props.name}/>
+
+           * data then finally received and used by c3 via props from c2->           <h1>hi from c3 {props.name} </h1>
+
+                                               THIS PROBLEM IS CALLED PROP DRILLING 
+
+Now to solve this we need to use useContext hook which will help in passing the data directly to Component3 from Component1 without 
+the need of passing the data down our component tree  
+
+
+Now we use the context api 
+
+1) it says that if we need to pass any data we need to create a "CONTEXT" 
+2) Then after creating a context we need a medium to pass on the data to the place where we need it so for that we have our "PROVIDER"
+3) Then after the PROVIDER does its work of passing on the data to the desired component we will be needing -> "CONSUMER" to consume
+   that data  (OR the useContext hook instead of the consumer)
+
+   ALL THESE THREE COMBINED MAKES WHAT WE CALL THE "CONTEXT API"
+
+BUT REMEMBER CONTEXT API IS DIFFERENT THAT useContext hook -> in our context api the consumer part is very lengthy so for that we 
+instead use the useContext hook   
+
+steps -> 
+
+1) create a context in where we want to send the data from 
+i.e in component1->
+// creating a context which will have two properties consumer and useContext
+const BioDataContext = createContext();
+
+2) now inside the return statement--->
+create a wrapper component with the Context name and Provider method on it -> 
+        <BioDataContext.Provider> </BioDataContext.Provider>
+
+3) Now inside this wrapper component place all the part / data that you want to pass on somewhere inside of a sub attribute that 
+this wrapper component has which is value  ->         
+<BioDataContext.Provider value={____INSIDE HERE PLACE THE THING YOU WANT TO PASS TO THE OTHER COMPONENT}> </BioDataContext.Provider>
+
+example->         <BioDataContext.Provider value={"Aditya"}>
+                      <Component2  />
+                  </BioDataContext.Provider>  
+
+4) also REMEMBER we need to export this wrapper component seprately with another exxport statement and that too inside a {}
+i.e->export {BioDataContext};                   
+
+
+5) Now as we used the context api we don't need to pass on any unnexessary data to the component b
+ so we just go to the place where we want to have that data and make use of ->
+
+  -> we firstly import that wrapper component here 
+
+6)  Now above the return statement -> 
+  {/* we make use of useContext hook and pass the context value which is the wrapper component that we created at the place where we want to send the data from 
+    -> as the consumer because we passed on the data with the help of context api  */}
+  -> then we apply useContext hook there ->        const myName = useContext(BioDataContext); 
+
+7) Now finally we get this value and we can use it here inside the return statement->        <h1>hi from c3 {myName} </h1>
+
+
+
+      ---***---This Is How We Apply ContextApi And useContext Hook To pass on the data directly without prop drilling---***---
+
+
